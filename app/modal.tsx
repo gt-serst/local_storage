@@ -20,11 +20,11 @@ export default function Modal() {
 	useEffect(() => {
 		if (id) {
 			setEditMode(true);
-			loadData();
+			handleRead();
 		}
 	}, [id]);
 
-	const loadData = async () => {
+	const handleRead = async () => {
 		const response = await readTransaction(db, parseInt(id as string))
 		if (response) {
 			console.log("Transaction readed successfully:", response);
@@ -40,13 +40,13 @@ export default function Modal() {
 		}
 	};
 
-	const handleCreate = () => {
-		createTransaction(db, category, amount, date, type, description);
+	const handleCreate = async () => {
+		await createTransaction(db, category, amount, date, type, description);
 		router.back()
 	};
 
-	const handleUpdate = () => {
-		updateTransaction(db, parseInt(id as string), category, amount, date, type, description);
+	const handleUpdate = async () => {
+		await updateTransaction(db, parseInt(id as string), category, amount, date, type, description);
 		router.back();
 	};
 

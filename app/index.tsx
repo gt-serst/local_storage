@@ -10,19 +10,19 @@ export default function Index(){
 	const [data, setData] = useState<TransactionType[]>([]);
 	const db = useSQLiteContext();
 
-	const loadData = async () => {
+	const handleRead = async () => {
 		const response = await readAllTransactions(db);
 		setData(response);
 	};
 
-	const handleDelete = (id: number) => {
-		deleteTransaction(db, id);
-		loadData();
+	const handleDelete = async (id: number) => {
+		await deleteTransaction(db, id);
+		handleRead();
 	};
 
 	useFocusEffect(
 		useCallback(() => {
-			loadData();
+			handleRead();
 		}, [])
 	);
 
