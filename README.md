@@ -1,5 +1,16 @@
 # local_storage
-## create expo react native app where users can CRUD profile preferences in a sqlite database while they are offline
-## create expo app by running the following line : npx create-expo-app local_storage
-## need to install the following package : npx expo install expo-sqlite
-## launch expo app by running the following line : npx expo start
+## Create an Expo React Native App for Offline Transaction
+This app allows users to perform CRUD (Create, Read, Update, Delete) operations on transactions stored in a local SQLite database, enabling offline functionality.
+## How to start
+* Create expo app by running the following line :
+```bash
+npx create-expo-app local_storage
+```
+* Need to install the following package :
+```bash
+npx expo install expo-sqlite
+```
+* Launch expo app by running the following line :
+```bash
+npx expo start
+```
