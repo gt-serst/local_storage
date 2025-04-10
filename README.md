@@ -1,5 +1,5 @@
 # local_storage
-## Create an Expo React Native App for Offline Transaction
+## Create an expo react native app for offline transaction
 This app allows users to perform CRUD (Create, Read, Update, Delete) operations on transactions stored in a local SQLite database, enabling offline functionality.
 ## How to start
 * Create expo app by running the following line :
