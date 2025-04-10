@@ -2,6 +2,7 @@ import { Stack, router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
+import { createTransaction, readTransaction, updateTransaction } from './db';
 
 export default function Modal() {
 
@@ -19,71 +20,34 @@ export default function Modal() {
 	useEffect(() => {
 		if (id) {
 			setEditMode(true);
-			readTransaction();
+			loadData();
 		}
 	}, [id]);
 
-	const readTransaction = async () => {
-		try {
-			const response = await db.getFirstAsync<{
-				category: string;
-				amount: string;
-				date: string;
-				type: string;
-				description: string;
-			}>('SELECT category, amount, date, type, description FROM transactions WHERE id = ?;', [parseInt(id as string)]);
-			if (response) {
-				console.log("Transaction readed successfully:", response);
-				setCategory(response.category);
-				setAmount(response.amount);
-				setDate(response.date);
-				setType(response.type);
-				setDescription(response.description);
-			}
-			else {
-				console.log('No transaction found with id:', id);
-				router.back();
-			}
-		} catch (error) {
-			console.log("Error reading transaction:", error);
+	const loadData = async () => {
+		const response = await readTransaction(db, parseInt(id as string))
+		if (response) {
+			console.log("Transaction readed successfully:", response);
+			setCategory(response.category);
+			setAmount(response.amount);
+			setDate(response.date);
+			setType(response.type);
+			setDescription(response.description);
 		}
-	};
-
-	const createTransaction = async () => {
-		try {
-			const response  = await db.runAsync(
-				'INSERT INTO transactions (category, amount, date, type, description) VALUES (?, ?, ?, ?, ?);', [
-					category,
-					amount,
-					date,
-					type,
-					description
-				]
-			);
-			console.log("Transaction created successfully:", response);
-			router.back()
-		} catch (error){
-			console.log("Error creating transaction:", error);
-		}
-	};
-
-	const updateTransaction = async () => {
-		try {
-			const response = await db.runAsync(
-				'UPDATE transactions SET category = ?, amount = ?, date = ?, type = ?, description = ? WHERE id = ?;', [
-					category,
-					amount,
-					date,
-					type,
-					description,
-					parseInt(id as string)
-				]
-			);
-			console.log("Transaction updated successfully:", response);
+		else {
+			console.log('No transaction found with id:', id);
 			router.back();
-		} catch (error) {
-			console.log("Error updating transaction:", error);
 		}
+	};
+
+	const handleCreate = () => {
+		createTransaction(db, category, amount, date, type, description);
+		router.back()
+	};
+
+	const handleUpdate = () => {
+		updateTransaction(db, parseInt(id as string), category, amount, date, type, description);
+		router.back();
 	};
 
 	return (
@@ -135,7 +99,7 @@ export default function Modal() {
 					<Text style={styles.buttonText}>Cancel</Text>
 				</TouchableOpacity>
 				<TouchableOpacity
-					onPress={async () => {editMode ? updateTransaction() : createTransaction()}}
+					onPress={async () => {editMode ? handleUpdate() : handleCreate()}}
 					style={[styles.button, { backgroundColor: 'blue' }]}
 				>
 					<Text style={styles.buttonText}>{editMode ? "Update" : "Save"}</Text>

@@ -3,40 +3,26 @@ import { router, Stack, useFocusEffect } from 'expo-router';
 import { Text, View, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons'
 import { useSQLiteContext } from 'expo-sqlite';
+import { TransactionType, readAllTransactions, deleteTransaction } from './db';
 
-type TransactionType = {id: number; category: string, amount: number, date: string, type: string, description: string};
 export default function Index(){
 
 	const [data, setData] = useState<TransactionType[]>([]);
 	const db = useSQLiteContext();
 
-	const readTransaction = async () => {
-		try {
-			const response = await db.getAllAsync<TransactionType>(
-				'SELECT * FROM transactions;',
-			);
-			console.log("Transaction readed successfully:", response);
-			setData(response);
-		} catch (error) {
-			console.log("Error reading transaction:", error);
-		}
+	const loadData = async () => {
+		const response = await readAllTransactions(db);
+		setData(response);
 	};
 
-	const deleteTransaction = async (id: number) => {
-		try {
-			const response = await db.runAsync(
-				'DELETE FROM transactions WHERE id = ?;', [id]
-			);
-			console.log("Transaction deleted successfully:", response);
-			readTransaction();
-		} catch (error) {
-			console.log("Error deleting transaction:", error);
-		}
+	const handleDelete = (id: number) => {
+		deleteTransaction(db, id);
+		loadData();
 	};
 
 	useFocusEffect(
 		useCallback(() => {
-			readTransaction();
+			loadData();
 		}, [])
 	);
 
@@ -90,7 +76,7 @@ export default function Index(){
 									</TouchableOpacity>
 									<TouchableOpacity
 										onPress={() => {
-											deleteTransaction(item.id);
+											handleDelete(item.id);
 										}}
 										style={[styles.button, { backgroundColor:'red' }]}
 									>
